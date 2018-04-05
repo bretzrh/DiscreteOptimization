@@ -42,14 +42,14 @@ def solve_it(input_data):
 	global best
 	best = 0  #global best_value
 	#global visited
-	#visited = 0 #global tracker
+	#visited = -1 #global tracker
 
 	def knapsack(i,V,W):
-		'''# DEBUG check the setting of the global variable
-		global visited
-		visited += 1
-		print('node ' + str(visited) + ': best = ' + str(best))
-		'''
+		# DEBUG check the setting of the global variable
+		#global visited
+		#visited += 1
+		#print('node ' + str(visited) ) # + ': best = ' + str(best))
+
 		global best
 
 		# kickback if item doesn't fit
@@ -61,17 +61,23 @@ def solve_it(input_data):
 			if V > best:
 				# global best wuz here
 				best = V
-				print('best set to ' + str(best))
-				print('net weight = ' + str(capacity-W))
+				#print('best set to ' + str(best))
+				#print('net weight = ' + str(capacity-W))
+				#print(" ")
 			return V
 
 		# check the bound
-		bound = get_bound(i,V,W) 
+		#print("value now = " +str(V) )
+		#print("remaining = " +str(W) )
+		bound = get_bound(i,V,W)
+		#print("bound = " +str(bound) )
+		#print("best = " +str(best) )
+		#print(" ")
 		if bound < best:
 			return -1
 
 		# return the best solution recursively
-		take_value = knapsack(i+1, V+sorted_items[i].value, W-items[i].weight)
+		take_value = knapsack(i+1, V+sorted_items[i].value, W-sorted_items[i].weight)
 		reject_value = knapsack(i+1, V, W)
 		return max(take_value, reject_value)
 
