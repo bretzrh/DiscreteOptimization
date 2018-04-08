@@ -1,9 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import sys
 import time
 from copy import copy
 from collections import namedtuple
 Item = namedtuple("Item", ['index', 'value', 'weight', 'density'])
+
+sys.setrecursionlimit(20000)
 
 def solve_it(input_data):
 	# Modify this code to run your optimization algorithm
