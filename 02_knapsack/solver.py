@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import time
+from copy import copy
 from collections import namedtuple
 Item = namedtuple("Item", ['index', 'value', 'weight', 'density'])
 
@@ -41,16 +42,26 @@ def solve_it(input_data):
 
 	global best
 	best = 0  #global best_value
+	global best_path
+	best_path = []
 	#global visited
 	#visited = -1 #global tracker
 
-	def knapsack(i,V,W):
+	def knapsack(i,V,W,path_to_here):
+		# V is the value to this point
+		# W is capacity left at this call
+
+		#print('path is ')
+		#print(map(str,path_to_here))
+		#print('')
+
 		# DEBUG check the setting of the global variable
 		#global visited
 		#visited += 1
 		#print('node ' + str(visited) ) # + ': best = ' + str(best))
 
 		global best
+		global best_path
 
 		# kickback if item doesn't fit
 		if W < 0:
@@ -61,15 +72,21 @@ def solve_it(input_data):
 			if V > best:
 				# global best wuz here
 				best = V
+				best_path = path_to_here
 				#print('best set to ' + str(best))
 				#print('net weight = ' + str(capacity-W))
+				#print('best_path now: ')
+				#print(map(str,best_path))
 				#print(" ")
 			return V
 
 		# check the bound
 		#print("value now = " +str(V) )
 		#print("remaining = " +str(W) )
+
+		# bound = sorted_items[i].density*W
 		bound = get_bound(i,V,W)
+
 		#print("bound = " +str(bound) )
 		#print("best = " +str(best) )
 		#print(" ")
@@ -77,8 +94,12 @@ def solve_it(input_data):
 			return -1
 
 		# return the best solution recursively
-		take_value = knapsack(i+1, V+sorted_items[i].value, W-sorted_items[i].weight)
-		reject_value = knapsack(i+1, V, W)
+		take_path = copy(path_to_here)
+		take_path.append(1)
+		take_value = knapsack(i+1, V+sorted_items[i].value, W-sorted_items[i].weight, take_path)
+		reject_path = copy(path_to_here)
+		reject_path.append(0)
+		reject_value = knapsack(i+1, V, W, reject_path)
 		return max(take_value, reject_value)
 
 	def get_bound(i,V,W):
@@ -97,7 +118,13 @@ def solve_it(input_data):
 		return bound
 
 	# call the function
-	value = knapsack(i,value,capacity)
+	path_to_here = []
+	value = knapsack(i,value,capacity,path_to_here)
+
+	assert len(best_path) == len(taken)
+	for k in range(len(best_path)):
+		if best_path[k] == 1:
+			taken[sorted_items[k].index] = 1
 
 	'''
 	#naive implementation
@@ -109,7 +136,7 @@ def solve_it(input_data):
 	'''
 
 	'''
-	# following is modified from
+	# following approach is modified from
 	# https://www.geeksforgeeks.org/knapsack-problem/
 	# and some C++ code I found
 	V = [[-1 for x in range(K+1)] for y in range(n+1)]
@@ -138,15 +165,15 @@ def solve_it(input_data):
 	# DEBUG print the run time
 	t1 = time.time()
 	total = t1-t0
-	print('time: ' + str(total))
+	#print('time: ' + str(total) + ' seconds')
 
-	'''
+
 	# prepare the solution in the specified output format
-	output_data = str(value) + ' ' + str(0) + '\n'
+	output_data = str(value) + ' ' + str(1) + '\n'
 	output_data += ' '.join(map(str, taken))
 	return output_data
-	'''
-	return value # DEBUG -- when complete, use the above output data format
+
+	#return value # DEBUG -- when complete, use the above output data format
 
 
 if __name__ == '__main__':
